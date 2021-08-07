@@ -1,0 +1,121 @@
+<CompuCell3D Revision="20210612" Version="4.2.5">
+   
+   <Metadata>
+      
+      <!-- Basic properties simulation -->
+      <NumberOfProcessors>1</NumberOfProcessors>
+      <DebugOutputFrequency>10</DebugOutputFrequency>
+      <!-- <NonParallelModule Name="Potts"/> -->
+   </Metadata>
+   
+   <Potts>
+      
+      <!-- Basic properties of CPM (GGH) algorithm -->
+      <Dimensions x="256" y="256" z="1"/>
+      <Steps>100000</Steps>
+      <Temperature>10.0</Temperature>
+      <NeighborOrder>2</NeighborOrder>
+      <Boundary_x>Periodic</Boundary_x>
+      <Boundary_y>Periodic</Boundary_y>
+   </Potts>
+   
+   <Plugin Name="CellType">
+      
+      <!-- Listing all cell types in the simulation -->
+      <CellType TypeId="0" TypeName="Medium"/>
+      <CellType TypeId="1" TypeName="prolif"/>
+      <CellType TypeId="2" TypeName="quies"/>
+      <CellType TypeId="3" TypeName="necro"/>
+   </Plugin>
+   
+   <Plugin Name="Volume"/>
+   
+   <Plugin Name="CenterOfMass">
+      
+      <!-- Module tracking center of mass of each cell -->
+   </Plugin>
+   
+   <Plugin Name="Contact">
+      <!-- Specification of adhesion energies -->
+      <Energy Type1="Medium" Type2="Medium">10.0</Energy>
+      <Energy Type1="Medium" Type2="prolif">10.0</Energy>
+      <Energy Type1="Medium" Type2="quies">10.0</Energy>
+      <Energy Type1="Medium" Type2="necro">10.0</Energy>
+      <Energy Type1="prolif" Type2="prolif">10.0</Energy>
+      <Energy Type1="prolif" Type2="quies">10.0</Energy>
+      <Energy Type1="prolif" Type2="necro">10.0</Energy>
+      <Energy Type1="quies" Type2="quies">10.0</Energy>
+      <Energy Type1="quies" Type2="necro">10.0</Energy>
+      <Energy Type1="necro" Type2="necro">10.0</Energy>
+      <NeighborOrder>4</NeighborOrder>
+   </Plugin>
+   
+   <Plugin Name="Secretion">
+      
+      <!-- Specification of secretion properties of select cell types. -->
+      <!-- You may repeat Field element for each chemical field declared in the PDE solvers -->
+      <!-- Specification of secretion properties of individual cells can be done in Python -->
+      <Field Name="nutr">
+         <ConstantConcentration Type="Medium">100.0</ConstantConcentration>
+      </Field>
+   </Plugin>
+   
+   <Steppable Type="DiffusionSolverFE">
+      
+      <!-- Specification of PDE solvers -->
+      <DiffusionField Name="nutr">
+         <DiffusionData>
+            <FieldName>nutr</FieldName>
+            <GlobalDiffusionConstant>10</GlobalDiffusionConstant>
+            <GlobalDecayConstant>0.01</GlobalDecayConstant>
+            <!-- Additional options are: -->
+            <InitialConcentrationExpression>100</InitialConcentrationExpression>
+            <!-- <ConcentrationFileName>INITIAL CONCENTRATION FIELD - typically a file with path Simulation/NAME_OF_THE_FILE.txt</ConcentrationFileName> -->
+            <!-- <DiffusionCoefficient CellType="prolif">0.1</DiffusionCoefficient> -->
+            <!-- <DiffusionCoefficient CellType="quies">0.1</DiffusionCoefficient> -->
+            <!-- <DiffusionCoefficient CellType="necro">0.1</DiffusionCoefficient> -->
+            <!-- <DecayCoefficient CellType="prolif">0.0001</DecayCoefficient> -->
+            <!-- <DecayCoefficient CellType="quies">0.0001</DecayCoefficient> -->
+            <!-- <DecayCoefficient CellType="necro">0.0001</DecayCoefficient> -->
+         </DiffusionData>
+         <SecretionData>
+            <!-- When secretion is defined inside DissufionSolverFE all secretion constants are scaled automaticaly to account for the extra calls to the diffusion step when handling large diffusion constants -->
+            
+            <!-- Uniform secretion Definition -->
+            <!-- <Secretion Type="prolif">0.1</Secretion> -->
+            <!-- <Secretion Type="quies">0.1</Secretion> -->
+            <!-- <Secretion Type="necro">0.1</Secretion> -->
+            <!-- <SecretionOnContact SecreteOnContactWith="prolif,quies,necro" Type="necro">0.2</SecretionOnContact> -->
+            <!-- <ConstantConcentration Type="necro">0.1</ConstantConcentration> -->
+         </SecretionData>
+         <BoundaryConditions>
+            <Plane Axis="X">
+               <!-- <ConstantValue PlanePosition="Min" Value="10.0"/> -->
+               <!-- <ConstantValue PlanePosition="Max" Value="5.0"/> -->
+               <!-- Other options are (examples): -->
+               <Periodic/>
+               <!-- <ConstantDerivative PlanePosition="Min" Value="10.0"/> -->
+            </Plane>
+            <Plane Axis="Y">
+               <!-- <ConstantDerivative PlanePosition="Min" Value="10.0"/> -->
+               <!-- <ConstantDerivative PlanePosition="Max" Value="5.0"/> -->
+               <!-- Other options are (examples): -->
+               <Periodic/>
+               <!-- <ConstantValue PlanePosition="Min" Value="10.0"/> -->
+            </Plane>
+         </BoundaryConditions>
+      </DiffusionField>
+   </Steppable>
+   
+   <Steppable Type="BlobInitializer">
+      
+      <!-- Initial layout of cells in the form of spherical (circular in 2D) blob -->
+      <Region>
+         <Center x="128" y="128" z="0"/>
+         <Radius>51</Radius>
+         <Gap>0</Gap>
+         <Width>8</Width>
+         <Types>prolif</Types>
+      </Region>
+   </Steppable>
+</CompuCell3D>
