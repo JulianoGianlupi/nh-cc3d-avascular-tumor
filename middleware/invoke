@@ -1,6 +1,6 @@
 #!/bin/sh
 # made using https://github.com/JulianoGianlupi/cc3d-nanoHub-tool-setuper
 /usr/bin/invoke_app "$@" -C @tool/bin/avasctum.sh -t avasctum \
-                         -u compucell3d-4.2.2 \
+                         -u compucell3d-4.4.0 \
                          -w captive \
                          -r none
